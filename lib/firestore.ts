@@ -40,11 +40,14 @@ export const getMenuItems = async (): Promise<MenuItem[]> => {
     }
 };
 
-export const addMenuItem = async (item: Omit<MenuItem, 'id'>) => {
+export const addMenuItem = async (item: Omit<MenuItem, 'id'> & { id?: string | number }) => {
     console.log("Adding item to Firestore:", item);
     try {
+        // Create a copy and remove 'id' if it exists (even if undefined) to prevent Firestore error
+        const { id, ...itemData } = item;
+
         const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-            ...item,
+            ...itemData,
             createdAt: new Date()
         });
         console.log("Item added with ID:", docRef.id);

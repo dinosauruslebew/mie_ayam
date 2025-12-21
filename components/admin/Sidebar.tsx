@@ -28,10 +28,11 @@ export default function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-stone-100 flex-shrink-0 flex flex-col justify-between h-screen sticky top-0 shadow-sm">
+    <aside className="w-64 bg-white flex-shrink-0 flex flex-col justify-between h-screen sticky top-0 border-r border-gray-100 z-20">
       <div>
-        <div className="p-8 pb-4 flex items-center gap-3">
-          <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-md">
+        {/* Logo Section */}
+        <div className="p-8 pb-8 flex items-center gap-3">
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm ring-1 ring-gray-100">
             <NextImage
               src="/images/logo_pak_min.png"
               alt="Logo Pak Min"
@@ -39,10 +40,15 @@ export default function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
               className="object-cover"
             />
           </div>
-          <h1 className="text-2xl font-extrabold text-stone-800 tracking-tight">Mie Ayam <br /><span className="text-orange-600">Pak Min</span></h1>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none">Mie Ayam</h1>
+            <span className="text-sm font-medium text-gray-400 tracking-wide">Pak Min Admin</span>
+          </div>
         </div>
 
-        <nav className="mt-8 px-4 space-y-2">
+        {/* Navigation */}
+        <nav className="px-4 space-y-2">
+          <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Menu</p>
           {menuItems.map((item) => {
             const isActive = activeMenu === item.key;
             return (
@@ -51,29 +57,26 @@ export default function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
                 onClick={() => setActiveMenu(item.key as 'makanan' | 'minuman')}
                 className={`flex items-center w-full px-5 py-3.5 rounded-xl transition-all duration-200 group
                   ${isActive
-                    ? 'bg-orange-50 text-orange-600 shadow-sm border-r-4 border-orange-500'
-                    : 'text-stone-500 hover:bg-stone-50 hover:text-stone-700'
+                    ? 'bg-orange-50 text-orange-600'
+                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                   }`}
               >
-                <div className={`p-2 rounded-lg transition-colors ${isActive ? 'bg-white/80' : 'bg-transparent'}`}>
-                  <item.icon size={22} className={isActive ? 'text-orange-600' : 'text-stone-400 group-hover:text-stone-600'} />
-                </div>
-                <span className="font-semibold text-base tracking-wide">{item.name}</span>
+                <item.icon size={22} className={isActive ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600 transition-colors'} />
+                <span className="font-semibold text-base tracking-wide ml-3">{item.name}</span>
               </button>
             );
           })}
         </nav>
       </div>
 
-      <div className="p-4 border-t border-stone-50">
+      {/* Logout */}
+      <div className="p-4 border-t border-gray-50">
         <button
           onClick={handleLogout}
-          className="flex items-center w-full px-5 py-3 rounded-xl text-stone-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+          className="flex items-center w-full px-5 py-3.5 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group"
         >
-          <div className="p-2 rounded-lg bg-transparent hover:bg-red-100/50 transition-colors mr-1">
-            <IoLogOutOutline size={22} />
-          </div>
-          <span className="font-semibold text-base tracking-wide">Keluar</span>
+          <IoLogOutOutline size={22} />
+          <span className="font-medium text-base tracking-wide ml-3">Keluar</span>
         </button>
       </div>
     </aside>

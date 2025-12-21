@@ -96,41 +96,31 @@ export default function AdminDashboardPage() {
       <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
 
       {/* 2. Main Content */}
-      <main className="flex-1 p-8 md:p-12 overflow-y-auto">
+      <main className="flex-1 p-8 md:p-12 overflow-y-auto bg-[#F9FAFB]">
 
-        {/* Header - Clean Version */}
-        <header className="flex justify-between items-center mb-10">
+        {/* Header - Soft */}
+        <header className="flex justify-between items-end mb-10">
           <div>
-            <h1 className="text-3xl font-extrabold text-stone-800 tracking-tight">Dashboard Menu</h1>
-            <p className="text-stone-500 mt-1">Kelola daftar {activeMenu} Anda dengan mudah</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Dashboard Overview</h1>
+            <p className="text-gray-500 mt-1 font-medium text-sm">Welcome back, Admin</p>
           </div>
-          {/* Right side removed as requested */}
+
+          <div className="bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span className="text-xs font-bold text-gray-600 uppercase tracking-wide">{filteredItems.length} Items</span>
+          </div>
         </header>
 
         {/* Content Section */}
         <section>
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-bold text-stone-800 capitalize">
-                Daftar {activeMenu}
-              </h2>
-              <div className="h-8 w-1 bg-orange-500 rounded-full"></div>
-            </div>
-
-            <span className="text-sm font-medium text-stone-500 bg-white px-4 py-1.5 rounded-full shadow-sm border border-stone-100">
-              {isLoading ? '...' : filteredItems.length} Item
-            </span>
-          </div>
-
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {/* Skeleton Loading - Bisa dibuat komponen terpisah */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-64 bg-gray-200 rounded-2xl animate-pulse"></div>
+                <div key={i} className="aspect-[3/4] bg-gray-100 rounded-2xl animate-pulse"></div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {/* Add New Card */}
               <AddNewItemCard
                 onClick={handleAddItem}
@@ -140,10 +130,10 @@ export default function AdminDashboardPage() {
               {/* Menu Items */}
               {filteredItems.map((item) => (
                 <MenuItemCard
-                  key={String(item.id)} // Ensure key is string
+                  key={String(item.id)}
                   item={item}
                   onEdit={handleEditItem}
-                  onDelete={(id) => handleDeleteItem(id)} // Fix type mismatch if Card expects number specific
+                  onDelete={(id) => handleDeleteItem(id)}
                 />
               ))}
             </div>

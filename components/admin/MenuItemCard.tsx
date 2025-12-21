@@ -19,48 +19,59 @@ const formatRupiah = (price: number): string => {
 
 export default function MenuItemCard({ item, onEdit, onDelete }: MenuItemCardProps) {
   return (
-    <div className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-stone-100 hover:border-orange-100 relative items-stretch flex flex-col h-full transform hover:-translate-y-1">
-      {/* Gambar Full Width */}
-      <div className="relative w-full h-48 overflow-hidden bg-stone-100">
+    <div className="group bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col h-full border border-gray-100 overflow-hidden hover:-translate-y-1 relative">
+
+      {/* Gambar */}
+      <div className="relative w-full aspect-[4/3] bg-gray-50 overflow-hidden">
         <Image
           src={item.gambar_url || "/images/placeholder.jpg"}
           alt={item.nama}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
         />
-        {/* Overlay Action Buttons (tampil saat hover) */}
-        <div className="absolute top-3 right-3 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+
+        {/* Actions (Simple, top right) */}
+        <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
             onClick={() => onEdit(item)}
-            className="bg-white/90 backdrop-blur-sm p-2 rounded-full text-blue-600 shadow-sm hover:bg-blue-50 transition"
-            aria-label="Edit"
+            className="w-8 h-8 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-full text-gray-700 hover:text-blue-600 shadow-sm transition-all hover:scale-105"
+            title="Edit Menu"
           >
-            <MdEdit size={18} />
+            <MdEdit size={14} />
           </button>
           <button
             onClick={() => onDelete(item.id)}
-            className="bg-white/90 backdrop-blur-sm p-2 rounded-full text-red-500 shadow-sm hover:bg-red-50 transition"
-            aria-label="Delete"
+            className="w-8 h-8 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-full text-gray-700 hover:text-red-500 shadow-sm transition-all hover:scale-105"
+            title="Hapus Menu"
           >
-            <MdDelete size={18} />
+            <MdDelete size={14} />
           </button>
         </div>
       </div>
 
       {/* Konten */}
-      <div className="p-5 flex flex-col flex-1">
-        <div className="flex-1">
-          <h3 className="text-lg font-bold text-gray-800 mb-1 line-clamp-2 leading-snug">{item.nama}</h3>
-          {/* Bisa tambahkan deskripsi singkat di sini jika ada */}
-        </div>
+      <div className="p-4 flex flex-col flex-1">
 
-        <div className="mt-4 flex items-center justify-between">
-          <p className="text-xl font-extrabold text-amber-600">{formatRupiah(item.harga)}</p>
-          {/* Badge Kategori */}
-          <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider
-                ${item.kategori === 'makanan' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'}`}>
-            {item.kategori}
-          </span>
+        {/* Title */}
+        <h3 className="text-base font-bold text-gray-900 leading-snug line-clamp-2 mb-1 group-hover:text-orange-600 transition-colors">
+          {item.nama}
+        </h3>
+
+        {/* Description */}
+        {item.deskripsi ? (
+          <p className="text-xs text-gray-500 line-clamp-2 mb-4 leading-relaxed flex-1">
+            {item.deskripsi}
+          </p>
+        ) : (
+          <div className="flex-1"></div>
+        )}
+
+        {/* Separator, Price & Rating (can add rating later if needed, stick to price for now) */}
+        <div className="pt-3 border-t border-dashed border-gray-100 flex justify-between items-center mt-auto">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Harga</span>
+            <p className="text-base font-extrabold text-gray-900">{formatRupiah(item.harga)}</p>
+          </div>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { MenuItem } from '@/data/data';
 import { IoClose, IoCloudUploadOutline, IoStar } from 'react-icons/io5';
-import { uploadImage } from '@/app/actions/upload';
+// import { uploadImage } from '@/app/actions/upload'; // Removed unused
 import Image from 'next/image';
 
 interface MenuFormModalProps {
@@ -73,6 +73,14 @@ const MenuFormModal: React.FC<MenuFormModalProps> = ({
     const files = e.target.files;
     if (files && files.length > 0) {
       const selectedFile = files[0];
+
+      // Validate file size (Max 5MB)
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        alert("Ukuran file terlalu besar! Maksimal 10MB.");
+        e.target.value = ''; // Reset input
+        return;
+      }
+
       setFile(selectedFile);
       setPreviewUrl(URL.createObjectURL(selectedFile));
     }
@@ -87,13 +95,55 @@ const MenuFormModal: React.FC<MenuFormModalProps> = ({
       let finalImageUrl = formData.gambar_url;
 
       if (file) {
-        console.log("Modal: File selected, starting upload...");
-        const data = new FormData();
-        data.append('file', file);
-        finalImageUrl = await uploadImage(data);
-        console.log("Modal: Image uploaded, URL:", finalImageUrl);
-      } else {
-        console.log("Modal: No new file selected, using existing URL:", finalImageUrl);
+        console.log("Modal: File selected, starting direct upload...");
+
+        // 1. Get Signature
+        const timestamp = Math.round((new Date).getTime() / 1000);
+        const folder = 'mie_ayam_pak_min';
+
+        const paramsToSign = {
+          timestamp,
+          folder,
+        };
+
+        const signatureResponse = await fetch('/api/cloudinary/sign', {
+          method: 'POST',
+          body: JSON.stringify({ paramsToSign }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!signatureResponse.ok) {
+          throw new Error('Gagal mendapatkan signature upload dari server.');
+        }
+
+        const { signature, apiKey: serverApiKey } = await signatureResponse.json();
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || serverApiKey;
+
+        if (!cloudName) throw new Error("Cloud Name config missing");
+        if (!apiKey) throw new Error("API Key missing");
+
+        // 2. Upload to Cloudinary
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+        uploadData.append('api_key', apiKey);
+        uploadData.append('timestamp', timestamp.toString());
+        uploadData.append('signature', signature);
+        uploadData.append('folder', folder);
+
+        const cloudinaryResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: 'POST',
+          body: uploadData
+        });
+
+        const cloudinaryResult = await cloudinaryResponse.json();
+
+        if (!cloudinaryResponse.ok) {
+          throw new Error(cloudinaryResult.error?.message || 'Upload ke Cloudinary gagal.');
+        }
+
+        finalImageUrl = cloudinaryResult.secure_url;
+        console.log("Modal: Direct Upload Success, URL:", finalImageUrl);
       }
 
       console.log("Modal: Calling onSave with data:", { ...formData, gambar_url: finalImageUrl });
@@ -115,7 +165,7 @@ const MenuFormModal: React.FC<MenuFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all scale-100 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl transform transition-all scale-100 overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 sticky top-0 z-10">
           <h2 className="text-xl font-bold text-gray-800">
@@ -143,7 +193,7 @@ const MenuFormModal: React.FC<MenuFormModalProps> = ({
                 value={formData.nama}
                 onChange={handleChange}
                 required
-                placeholder="Contoh: Mie Ayam Spesial"
+                placeholder="Contoh: npMie Ayam"
                 className="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-shadow outline-none text-stone-800 placeholder:text-stone-400"
                 disabled={isLoading}
               />
@@ -230,8 +280,9 @@ const MenuFormModal: React.FC<MenuFormModalProps> = ({
                     <div className="flex text-sm text-gray-600">
                       <span className="font-semibold text-amber-600 hover:text-amber-500">Klik untuk upload</span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">PNG, JPG (Max 5MB)</p>
-                  </label>
+                    <p className="text-xs text-gray-400 mt-2">
+                      Format: JPG, PNG, WEBP. Maksimal 10MB.
+                    </p>  </label>
                 )}
                 <input
                   id="file-upload"
